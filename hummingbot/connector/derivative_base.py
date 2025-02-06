@@ -47,6 +47,25 @@ class DerivativeBase(ExchangeBase):
         self._leverageshort = leverageshort
         return
 
+    def set_margin(self, trading_pair: str, margin: int, tradeside: str = "cross"):
+        """
+        Should set the _marginlong and _marginshort parameter. i.e self._marginlong = margin
+        This should also be overwritten if the derivative exchange requires interraction to set margin,
+        in addition to setting the _marginlong / _marginshort object.
+        :param _margin: margin to be used
+        :param _tradeside: tradesite to be used
+        """
+        if tradeside == "long":
+            self._marginlong = margin
+            # self._marginshort = 0
+        elif tradeside == "short":
+            # self._marginlong = 0
+            self._marginshort = margin
+        else:
+            self._marginlong = margin
+            self._marginshort = margin
+        return
+
     def supported_position_modes(self):
         """
         returns a list containing the modes supported by the derivative
