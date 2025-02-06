@@ -116,6 +116,9 @@ class PerpetualDerivativePyBase(ExchangePyBase, ABC):
     def set_leverage(self, trading_pair: str, leverage: int = 1):
         safe_ensure_future(self._execute_set_leverage(trading_pair, leverage))
 
+    def set_margin(self, trading_pair: str, margin: int, tradeside: str = "cross"):
+        safe_ensure_future(self._execute_set_margin(trading_pair, margin, tradeside))
+
     def get_funding_info(self, trading_pair: str) -> FundingInfo:
         return self._perpetual_trading.get_funding_info(trading_pair)
 
@@ -192,6 +195,10 @@ class PerpetualDerivativePyBase(ExchangePyBase, ABC):
 
     @abstractmethod
     async def _set_trading_pair_leverage(self, trading_pair: str, leverage: int, leverageshort: int) -> Tuple[bool, str]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def _set_trading_pair_margin(self, trading_pair: str, margin: int, tradeside: str) -> Tuple[bool, str]:
         raise NotImplementedError
 
     @abstractmethod
@@ -371,6 +378,14 @@ class PerpetualDerivativePyBase(ExchangePyBase, ABC):
                     self.logger().info(f"Buy-leverage for {trading_pair} successfully set to {leverage}. Sell-leverage for {trading_pair} successfully set to {leverageshort}.")
                 else:
                     self.logger().network(f"Error setting buy-leverage {leverage} / sell-leverage {leverageshort} for {trading_pair}: {msg}")
+
+    async def _execute_set_margin(self, trading_pair: str, margin: int, tradeside: str):
+        success, msg = await self._set_trading_pair_margin(trading_pair, margin, tradeside)
+        if success:
+            self._perpetual_trading.set_margin(trading_pair, margin, tradeside)
+            self.logger().info(f"Margin for {trading_pair} successfully set to {margin}.")
+        else:
+            self.logger().network(f"Error setting margin {margin} for {trading_pair}: {msg}")
 
     async def _listen_for_funding_info(self):
         await self._init_funding_info()
