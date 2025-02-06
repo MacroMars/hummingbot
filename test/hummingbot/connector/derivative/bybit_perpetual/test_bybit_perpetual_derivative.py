@@ -1087,6 +1087,53 @@ class BybitPerpetualDerivativeTests(AbstractPerpetualDerivativeTests.PerpetualDe
 
         return url
 
+    def configure_failed_set_margin(
+        self,
+        margin: PositionMode,
+        mock_api: aioresponses,
+        callback: Optional[Callable] = lambda *args, **kwargs: None,
+    ) -> Tuple[str, str]:
+        url = web_utils.get_rest_url_for_endpoint(
+            endpoint=CONSTANTS.SET_MARGIN_PATH_URL, trading_pair=self.trading_pair
+        )
+        regex_url = re.compile(f"^{url}")
+
+        err_code = 1
+        err_msg = "Some problem"
+        mock_response = {
+            "retCode": err_code,
+            "retMsg": err_msg,
+            "result": {},
+            "retExtInfo": {},
+            "time": 1672281607343
+        }
+        mock_api.post(regex_url, body=json.dumps(mock_response), callback=callback)
+
+        return url, f"ret_code <{err_code}> - {err_msg}"
+
+    def configure_successful_set_margin(
+        self,
+        margin: int,
+        mock_api: aioresponses,
+        callback: Optional[Callable] = lambda *args, **kwargs: None,
+    ):
+        url = web_utils.get_rest_url_for_endpoint(
+            endpoint=CONSTANTS.SET_MARGIN_PATH_URL, trading_pair=self.trading_pair
+        )
+        regex_url = re.compile(f"^{url}")
+
+        mock_response = {
+            "retCode": 0,
+            "retMsg": "OK",
+            "result": {},
+            "retExtInfo": {},
+            "time": 1672281607343
+        }
+
+        mock_api.post(regex_url, body=json.dumps(mock_response), callback=callback)
+
+        return url
+
     def order_event_for_new_order_websocket_update(self, order: InFlightOrder):
         return {
             "id": "5923240c6880ab-c59f-420b-9adb-3639adc9dd90",
