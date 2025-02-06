@@ -152,6 +152,27 @@ class AbstractPerpetualDerivativeTests:
             raise NotImplementedError
 
         @abstractmethod
+        def configure_failed_set_margin(
+            self,
+            margin: int,
+            mock_api: aioresponses,
+            callback: Optional[Callable] = lambda *args, **kwargs: None,
+        ) -> Tuple[str, str]:
+            ""
+            :return: A tuple of the URL and an error message if the exchange returns one on failure.
+            ""
+            raise NotImplementedError
+
+        @abstractmethod
+        def configure_successful_set_margin(
+            self,
+            margin: int,
+            mock_api: aioresponses,
+            callback: Optional[Callable] = lambda *args, **kwargs: None,
+        ):
+            raise NotImplementedError
+
+        @abstractmethod
         def funding_info_event_for_websocket_update(self):
             raise NotImplementedError
 
@@ -660,6 +681,44 @@ class AbstractPerpetualDerivativeTests:
                 self.is_logged(
                     log_level="INFO",
                     message=f"Leverage for {self.trading_pair} successfully set to {target_leverage}.",
+                )
+            )
+
+        @aioresponses()
+        def test_set_margin_failure(self, mock_api):
+            request_sent_event = asyncio.Event()
+            target_margin = 2
+            _, message = self.configure_failed_set_margin(
+                margin=target_margin,
+                mock_api=mock_api,
+                callback=lambda *args, **kwargs: request_sent_event.set(),
+            )
+            self.exchange.set_margin(trading_pair=self.trading_pair, margin=target_margin, tradeside='long')
+            self.async_run_with_timeout(request_sent_event.wait())
+
+            self.assertTrue(
+                self.is_logged(
+                    log_level="NETWORK",
+                    message=f"Error setting margin {target_margin} for {self.trading_pair}: {message}",
+                )
+            )
+
+        @aioresponses()
+        def test_set_margin_success(self, mock_api):
+            request_sent_event = asyncio.Event()
+            target_margin = 200
+            self.configure_successful_set_margin(
+                leverage=target_margin,
+                mock_api=mock_api,
+                callback=lambda *args, **kwargs: request_sent_event.set(),
+            )
+            self.exchange.set_margin(trading_pair=self.trading_pair, margin=target_margin, tradeside='long')
+            self.async_run_with_timeout(request_sent_event.wait())
+
+            self.assertTrue(
+                self.is_logged(
+                    log_level="INFO",
+                    message=f"Margin for {self.trading_pair} successfully set to {target_margin}.",
                 )
             )
 
