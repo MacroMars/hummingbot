@@ -842,6 +842,33 @@ class BybitPerpetualDerivative(PerpetualDerivativePyBase):
 
         return success, msg
 
+    async def _set_trading_pair_margin(self, trading_pair: str, margin: int, tradeside: str) -> Tuple[bool, str]:
+        exchange_symbol = await self.exchange_symbol_associated_to_pair(trading_pair)
+        val_long = 1
+        val_short = 2
+        data = {
+            "category": "linear" if bybit_utils.is_linear_perpetual(trading_pair) else "inverse",
+            "symbol": exchange_symbol,
+            "margin": str(margin),
+            "positionIdx": int(val_long) if tradeside == "long" else int(val_short)
+        }
+        resp: Dict[str, Any] = await self._api_post(
+            path_url=CONSTANTS.SET_MARGIN_PATH_URL,
+            data=data,
+            is_auth_required=True,
+            trading_pair=trading_pair,
+        )
+
+        success = False
+        msg = ""
+        if resp["retCode"] in [CONSTANTS.RET_CODE_OK, CONSTANTS.RET_CODE_MARGIN_NOT_MODIFIED]:
+            success = True
+        else:
+            formatted_ret_code = self._format_ret_code_for_print(resp['retCode'])
+            msg = f"{formatted_ret_code} - {resp['retMsg']}"
+
+        return success, msg
+
     async def _fetch_last_fee_payment(self, trading_pair: str) -> Tuple[int, Decimal, Decimal]:
         # exchange_symbol = await self.exchange_symbol_associated_to_pair(trading_pair)
 
