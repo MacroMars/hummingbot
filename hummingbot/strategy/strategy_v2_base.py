@@ -337,8 +337,8 @@ class StrategyV2Base(ScriptStrategyBase):
     def get_all_executors(self) -> List[ExecutorInfo]:
         return [executor for executors in self.executors_info.values() for executor in executors]
 
-    def set_leverage(self, connector: str, trading_pair: str, leverage: int):
-        self.connectors[connector].set_leverage(trading_pair, leverage)
+    def set_leverage(self, connector: str, trading_pair: str, leverage: int, leverageshort: int):
+        self.connectors[connector].set_leverage(trading_pair, leverage, leverageshort)
 
     def set_position_mode(self, connector: str, position_mode: PositionMode):
         self.connectors[connector].set_position_mode(position_mode)
