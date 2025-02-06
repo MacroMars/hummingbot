@@ -23,6 +23,8 @@ class PerpetualTrading:
         self._position_mode: PositionMode = PositionMode.ONEWAY
         self._leverage: Dict[str, int] = defaultdict(lambda: 1)
         self._leverageshort: Dict[str, int] = defaultdict(lambda: 1)
+        self._marginlong: Dict[str, int] = defaultdict(lambda: 100)
+        self._marginshort: Dict[str, int] = defaultdict(lambda: 100)
         self._trading_pairs = trading_pairs
 
         self._funding_info: Dict[str, FundingInfo] = {}
@@ -161,6 +163,24 @@ class PerpetualTrading:
         """
         self._leverage[trading_pair] = leverage
         self._leverageshort[trading_pair] = leverageshort
+
+    def set_margin(self, trading_pair: str, margin: int = 1, tradeside: str = "cross"):
+        """
+        Sets margin, e.g. 200, 1000, etc..
+        A child class may need to override this to set margin on the exchange
+        :param trading_pair: the market trading pair
+        :param margin: the margin to add
+        :param tradeside: the side of the trade (for isolated margin only)
+        """
+        if tradeside == "long":
+            self._marginlong[trading_pair] = margin
+            # self._marginshort = 0
+        elif tradeside == "short":
+            # self._marginlong = 0
+            self._marginshort[trading_pair] = margin
+        else:
+            self._marginlong[trading_pair] = margin
+            self._marginshort[trading_pair] = margin
 
     def get_funding_info(self, trading_pair: str) -> FundingInfo:
         """
