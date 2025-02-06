@@ -35,14 +35,16 @@ class DerivativeBase(ExchangeBase):
         self._position_mode = position_mode
         return
 
-    def set_leverage(self, trading_pair: str, leverage: int = 1):
+    def set_leverage(self, trading_pair: str, leverage: int = 1, leverageshort: int = -1):
         """
         Should set the _leverage parameter. i.e self._leverage = leverage
         This should also be overwritten if the derivative exchange requires interraction to set leverage,
         in addition to setting the _leverage object.
         :param _leverage: leverage to be used
+        :param _leverageshort: leverage to be used on short side
         """
         self._leverage = leverage
+        self._leverageshort = leverageshort
         return
 
     def supported_position_modes(self):
