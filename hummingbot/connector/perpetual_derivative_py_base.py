@@ -191,7 +191,7 @@ class PerpetualDerivativePyBase(ExchangePyBase, ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def _set_trading_pair_leverage(self, trading_pair: str, leverage: int) -> Tuple[bool, str]:
+    async def _set_trading_pair_leverage(self, trading_pair: str, leverage: int, leverageshort: int) -> Tuple[bool, str]:
         raise NotImplementedError
 
     @abstractmethod
