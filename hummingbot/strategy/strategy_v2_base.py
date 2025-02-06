@@ -340,6 +340,9 @@ class StrategyV2Base(ScriptStrategyBase):
     def set_leverage(self, connector: str, trading_pair: str, leverage: int, leverageshort: int):
         self.connectors[connector].set_leverage(trading_pair, leverage, leverageshort)
 
+    def set_margin(self, connector: str, trading_pair: str, margin: int, tradeside: str):
+        self.connectors[connector].set_margin(trading_pair, margin, tradeside)
+
     def set_position_mode(self, connector: str, position_mode: PositionMode):
         self.connectors[connector].set_position_mode(position_mode)
 
