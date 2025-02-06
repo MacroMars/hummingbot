@@ -76,6 +76,9 @@ SERVER_TIME_PATH_URL = {
 SET_LEVERAGE_PATH_URL = {
     LINEAR_MARKET: "v5/position/set-leverage",
     NON_LINEAR_MARKET: "v5/position/set-leverage"}
+SET_MARGIN_PATH_URL = {
+    LINEAR_MARKET: "v5/position/add-margin",
+    NON_LINEAR_MARKET: "v5/position/add-margin"}
 GET_LAST_FUNDING_RATE_PATH_URL = {
     LINEAR_MARKET: "v5/account/transaction-log",
     NON_LINEAR_MARKET: "v5/account/contract-transaction-log"}
@@ -152,6 +155,7 @@ RET_CODE_MODE_ORDER_NOT_EMPTY = 110028
 RET_CODE_HEDGE_NOT_SUPPORTED = 110029
 
 RET_CODE_LEVERAGE_NOT_MODIFIED = 110043
+RET_CODE_MARGIN_NOT_MODIFIED = 110027
 
 RET_CODE_ORDER_NOT_EXISTS = 110001
 
