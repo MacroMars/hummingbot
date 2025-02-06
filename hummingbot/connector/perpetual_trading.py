@@ -22,6 +22,7 @@ class PerpetualTrading:
         self._account_positions: Dict[str, Position] = {}
         self._position_mode: PositionMode = PositionMode.ONEWAY
         self._leverage: Dict[str, int] = defaultdict(lambda: 1)
+        self._leverageshort: Dict[str, int] = defaultdict(lambda: 1)
         self._trading_pairs = trading_pairs
 
         self._funding_info: Dict[str, FundingInfo] = {}
@@ -150,14 +151,16 @@ class PerpetualTrading:
         """
         return self._leverage[trading_pair]
 
-    def set_leverage(self, trading_pair: str, leverage: int = 1):
+    def set_leverage(self, trading_pair: str, leverage: int = 1, leverageshort: int = -1):
         """
         Sets leverage level, e.g. 2x, 10x, etc..
         A child class may need to override this to set leverage level on the exchange
         :param trading_pair: the market trading pair
         :param leverage: leverage to be used
+        :param leverageshort: leverage to be used on short side
         """
         self._leverage[trading_pair] = leverage
+        self._leverageshort[trading_pair] = leverageshort
 
     def get_funding_info(self, trading_pair: str) -> FundingInfo:
         """
