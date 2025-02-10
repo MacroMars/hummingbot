@@ -352,13 +352,25 @@ class PerpetualDerivativePyBase(ExchangePyBase, ABC):
 
         return success, successful_pairs, msg
 
-    async def _execute_set_leverage(self, trading_pair: str, leverage: int):
-        success, msg = await self._set_trading_pair_leverage(trading_pair, leverage)
-        if success:
-            self._perpetual_trading.set_leverage(trading_pair, leverage)
-            self.logger().info(f"Leverage for {trading_pair} successfully set to {leverage}.")
+    async def _execute_set_leverage(self, trading_pair: str, leverage: int, leverageshort: int):
+        if leverageshort == -1:
+            success, msg = await self._set_trading_pair_leverage(trading_pair, leverage)
+            if success:
+                self._perpetual_trading.set_leverage(trading_pair, leverage)
+                self.logger().info(f"Leverage for {trading_pair} successfully set to {leverage}.")
+            else:
+                self.logger().network(f"Error setting leverage {leverage} for {trading_pair}: {msg}")
         else:
-            self.logger().network(f"Error setting leverage {leverage} for {trading_pair}: {msg}")
+            try:
+                success, msg = await self._set_trading_pair_leverage(trading_pair, leverage, leverageshort)
+            except TypeError:
+                self.logger().network(f"The Connector {self.display_name} only support one Value for leverage. Buy-leverage {leverage} / sell-leverage {leverageshort} for {trading_pair} not set.")
+            else:
+                if success:
+                    self._perpetual_trading.set_leverage(trading_pair, leverage, leverageshort)
+                    self.logger().info(f"Buy-leverage for {trading_pair} successfully set to {leverage}. Sell-leverage for {trading_pair} successfully set to {leverageshort}.")
+                else:
+                    self.logger().network(f"Error setting buy-leverage {leverage} / sell-leverage {leverageshort} for {trading_pair}: {msg}")
 
     async def _listen_for_funding_info(self):
         await self._init_funding_info()
