@@ -806,13 +806,13 @@ class BybitPerpetualDerivative(PerpetualDerivativePyBase):
 
         return success, msg
 
-    async def _set_trading_pair_leverage(self, trading_pair: str, leverage: int) -> Tuple[bool, str]:
+    async def _set_trading_pair_leverage(self, trading_pair: str, leverage: int, leverageshort: int) -> Tuple[bool, str]:
         exchange_symbol = await self.exchange_symbol_associated_to_pair(trading_pair)
         data = {
             "category": "linear" if bybit_utils.is_linear_perpetual(trading_pair) else "inverse",
             "symbol": exchange_symbol,
             "buyLeverage": str(leverage),
-            "sellLeverage": str(leverage)
+            "sellLeverage": str(leverageshort)
         }
         resp: Dict[str, Any] = await self._api_post(
             path_url=CONSTANTS.SET_LEVERAGE_PATH_URL,
