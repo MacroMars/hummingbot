@@ -113,8 +113,8 @@ class PerpetualDerivativePyBase(ExchangePyBase, ABC):
     def get_leverage(self, trading_pair: str) -> int:
         return self._perpetual_trading.get_leverage(trading_pair)
 
-    def set_leverage(self, trading_pair: str, leverage: int = 1):
-        safe_ensure_future(self._execute_set_leverage(trading_pair, leverage))
+    def set_leverage(self, trading_pair: str, leverage: int = 1, leverageshort: int = -1):
+        safe_ensure_future(self._execute_set_leverage(trading_pair, leverage, leverageshort))
 
     def get_funding_info(self, trading_pair: str) -> FundingInfo:
         return self._perpetual_trading.get_funding_info(trading_pair)
